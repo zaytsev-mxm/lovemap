@@ -1,0 +1,5 @@
+{
+  "name": "leaflet",
+  "main": "./leaflet.ts",
+  "version": "1.0.0"
+}
