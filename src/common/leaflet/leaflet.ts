@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import LovemapHeatmapLayer from './heatmap-layer';
 
 type LeafletParams = {
     domNode?: HTMLElement | null;
@@ -30,8 +31,6 @@ class Leaflet implements ILeaflet {
 
         this.map = null;
 
-        if (!this.rootEl) return;
-
         this.init();
     }
 
@@ -41,11 +40,15 @@ class Leaflet implements ILeaflet {
             attribution: this.osmAttribution
         });
 
-        // @ts-ignore check for mapEl existing added above
-        this.map = L.map(this.rootEl, {
-            center: [51.505, -0.09],
-            zoom: 13,
-            layers: [osmLayer]
+        const heatmapLayerInstance = new LovemapHeatmapLayer();
+        const heatmapLayer = heatmapLayerInstance.overlay;
+
+        if (!this.rootEl) return;
+
+        this.map = new L.Map(this.rootEl, {
+            center: new L.LatLng(25.6586, -80.3568),
+            zoom: 4,
+            layers: [osmLayer, heatmapLayer]
         });
     }
 
