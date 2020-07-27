@@ -20,6 +20,7 @@ class Leaflet implements ILeaflet {
     static DEFAULTS = {
         // OSM_URL: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';,
         OSM_URL: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+        // OSM_URL: 'http://a.tile.stamen.com/toner/{z}/{x}/{y}.png',
         OSM_ATTRIBUTION: `Map data <a target="_blank" href="http://www.openstreetmap.org">OpenStreetMap.org</a>
             contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>`,
     };
@@ -50,6 +51,10 @@ class Leaflet implements ILeaflet {
             zoom: 4,
             layers: [osmLayer, heatmapLayer]
         });
+
+        setInterval(() => {
+            heatmapLayer.setData(LovemapHeatmapLayer.getRandomData());
+        }, 5000);
     }
 
     destroy() {

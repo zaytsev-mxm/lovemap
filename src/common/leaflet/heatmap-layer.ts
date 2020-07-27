@@ -1,4 +1,5 @@
 import LeafletHeatmap from 'leaflet-heatmap';
+import { getRandomInt } from '../../utils/number-utils';
 
 type LovemapHeatmapParams = {
     data?: LovemapHeatmapData;
@@ -54,9 +55,33 @@ class LovemapHeatmapLayer {
             useLocalExtrema: true,
             latField: 'lat',
             lngField: 'lng',
-            valueField: 'count'
+            valueField: 'count',
+            gradient: {
+                // enter n keys between 0 and 1 here
+                // for gradient color customization
+                '.5': '#8423f5',
+                '.8': '#c232f6',
+                '.95': '#e933f7'
+            },
         },
     };
+
+    static getRandomData() {
+        const min = getRandomInt(1, 10);
+        const max = getRandomInt(min, 20);
+
+        return {
+            min,
+            max,
+            data: LovemapHeatmapLayer.DEFAULTS.DATA.data.map((point: HeatMapPoint) => {
+                return {
+                    lat: point.lat,
+                    lng: point.lng,
+                    count: getRandomInt(1, 10),
+                };
+            }),
+        }
+    }
 
     constructor(params: LovemapHeatmapParams = {}) {
         this.data = params.data || LovemapHeatmapLayer.DEFAULTS.DATA;
@@ -64,8 +89,8 @@ class LovemapHeatmapLayer {
 
         this.overlay = new LeafletHeatmap(this.config);
 
-        // TODO: rewrite following
-        this.setData(this.data);
+        // TODO: rewrite following line of code
+        this.setData(LovemapHeatmapLayer.getRandomData());
     }
 
     setData(data: LovemapHeatmapData) {
