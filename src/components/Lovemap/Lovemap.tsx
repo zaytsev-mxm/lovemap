@@ -1,6 +1,8 @@
 import * as React from 'react';
 import 'leaflet/dist/leaflet.css';
 import Leaflet from '../../common/leaflet/leaflet';
+import DeckGl from '../DeckGl/DeckGl';
+
 import './Lovemap.scss';
 
 const Lovemap = () => {
@@ -20,10 +22,14 @@ const Lovemap = () => {
         };
     }, [mapRef]);
 
+    const renderLeaflet = () => {
+        return <div ref={mapRef} className="love-map"/>;
+    };
+
     return (
         <div>
             <h1>Lovemap</h1>
-            <div ref={mapRef} className="love-map"/>
+            <DeckGl />
         </div>
     );
 };
