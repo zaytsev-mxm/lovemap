@@ -5,10 +5,17 @@ import DeckGL from '@deck.gl/react';
 // @ts-ignore
 import {ScreenGridLayer} from '@deck.gl/aggregation-layers';
 // @ts-ignore
+import { HeatmapLayer } from '@deck.gl/aggregation-layers';
+// @ts-ignore
 import {isWebGL2} from '@luma.gl/core';
 
+// @ts-ignore
 import sampleJSON from '../../common/data/sample.json';
+import coordsJSON from '../../common/data/coords.json';
+
+// @ts-ignore
 import getGeoData from "../../utils/getGeoData";
+import getRandomCoords from "../../utils/getRandomCoords";
 
 // Set your mapbox token here
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiYm9iYnktbGF0ZWxlYW4iLCJhIjoiY2ticnFqbWh6MjE5djJ5cG80Y29raGljZyJ9.V4TEhPk8-75-MSXMR5K5zg'; // eslint-disable-line
@@ -27,19 +34,19 @@ const INITIAL_VIEW_STATE = {
 };
 
 const colorRange = [
-    [189, 0, 38, 255],
-    [189, 0, 38, 255],
-    [189, 0, 38, 255],
-    [189, 0, 38, 255],
-    [189, 0, 38, 255],
-    [189, 0, 38, 255],
+    // [189, 0, 38, 255],
+    // [189, 0, 38, 255],
+    // [189, 0, 38, 255],
+    // [189, 0, 38, 255],
+    // [189, 0, 38, 255],
+    // [189, 0, 38, 255],
 
-    // [255, 255, 178, 25],
-    // [254, 217, 118, 85],
-    // [254, 178, 76, 127],
-    // [253, 141, 60, 170],
-    // [240, 59, 32, 212],
-    // [189, 0, 38, 255]
+    [255, 255, 178, 25],
+    [254, 217, 118, 85],
+    [254, 178, 76, 127],
+    [253, 141, 60, 170],
+    [240, 59, 32, 212],
+    [189, 0, 38, 255]
 ];
 
 type DeckGlProps = {
@@ -52,32 +59,41 @@ type DeckGlProps = {
 };
 
 const DeckGl: React.FunctionComponent<DeckGlProps> = (props) => {
-    const { features = [] } = sampleJSON;
-    const geoJSON = getGeoData(features);
-    console.log('[zaytsev] geoJSON: ', geoJSON);
+    // const { features = [] } = sampleJSON;
+    // const geoJSON = getGeoData(features);
+    // console.log('[zaytsev] geoJSON: ', geoJSON);
+
+    const coords = getRandomCoords(coordsJSON);
+
     const {
         // data = DATA_URL,
-        data = geoJSON,
+        data = coords,
         cellSize = 10,
         gpuAggregation = true,
         aggregation = 'SUM',
         disableGPUAggregation,
-        mapStyle = 'mapbox://styles/mapbox/light-v8'
+        mapStyle = 'mapbox://styles/mapbox/dark-v9'
     } = props;
 
-    const layers = [
-        new ScreenGridLayer({
-            id: 'grid',
-            data,
-            opacity: 0.8,
-            getPosition: (d: any) => [d.lng, d.lat],
-            getWeight: (d: any) => d.count,
-            cellSizePixels: cellSize,
-            colorRange,
-            gpuAggregation,
-            aggregation
-        })
-    ];
+    const heatmapLayer = new HeatmapLayer({
+        id: 'grid',
+        data,
+        opacity: 0.8,
+        getPosition: (d: any) => [d.lg, d.lt],
+        getWeight: (d: any) => {
+            const weight = Number(d.v);
+            return weight >= 0 ? weight : 0;
+        },
+        cellSizePixels: cellSize,
+        colorRange,
+        gpuAggregation,
+        aggregation,
+        intensity: 1,
+        threshold: 0.03,
+        radiusPixels: 30,
+    });
+
+    const layers = [heatmapLayer];
 
     const onInitialized = (gl: any) => {
         if (!isWebGL2(gl)) {
